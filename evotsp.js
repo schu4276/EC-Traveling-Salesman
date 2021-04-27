@@ -1,6 +1,6 @@
 (function evoTSPwrapper($) {
   const baseUrl =
-    "https://nh5gsos957.execute-api.us-east-1.amazonaws.com/prod/";
+    "https://yu0o6nuywg.execute-api.us-east-1.amazonaws.com/prod/";
 
   /*
    * This is organized into sections:
@@ -87,7 +87,7 @@
     }
     
     function runAllGenerations(cb) {
-      // get # of generations
+      // get # of generation
       const numGenerations = parseInt($("#num-generations").val());
 
       // `async.timesSeries` runs the given function the specified number
@@ -120,24 +120,26 @@
   }
 
   function randomRoute(runId, generation, cb) {
-    AWSAjax(
-      {
-        runId: runId,
-        generation: generation,
-        lengthStoreThreshold: lengthStoreThreshold,
-      },
-      "/routes",
-      displayRoute,
-      ["generating random route", "when creating a random route"]
-    )
-    // If the Ajax call succeeds, return the newly generated route.
-    .done((newRoute) => { cb(null, newRoute); })
-    // If the Ajax call fails, print a message and pass the error up through
-    // the callback function `cb`.
-    .fail((jqHXR, textStatus, err) => {
-      console.error("Problem with randomRoute AJAX call: " + textStatus);
-      cb(err);
-    });
+    $.ajax({
+      method: 'POST',
+      url: baseUrl + '/routes',
+      data: JSON.stringify({
+          runId: runId,
+          generation: generation
+      }),
+      contentType: 'application/json',
+
+      success: displayRoute,
+      error: function ajaxError(jqXHR, textStatus, errorThrown) {
+          console.error(
+              'Error generating random route: ', 
+              textStatus, 
+              ', Details: ', 
+              errorThrown);
+          console.error('Response: ', jqXHR.responseText);
+          alert('An error occurred when creating a random route:\n' + jqXHR.responseText);
+      }
+  }).done((randomRoute) =>  cb(null, randomRoute))
   }
 
   ////////////////////////////////////////////////////////////
@@ -297,6 +299,17 @@
   // be passed along in the `runGeneration` waterfall. 
   function getBestRoutes(generation, callback) {
     // FILL THIS IN
+    const runId = $('#runId-text-field').val();
+    const numToReturn = $('#num-parents').val();
+    gen = $('#num-generations').val();
+    var settings = {
+      "url": `https://yu0o6nuywg.execute-api.us-east-1.amazonaws.com/prod/best?runId=${runId}&generation=${generation}&numToReturn=${numToReturn}`,
+      "method": "GET",
+      "timeout": 0,
+    };
+
+
+    $.ajax(settings).done((bestRoutes) =>  callback(null, bestRoutes))
   }
 
   // Create the specified number of children by mutating the given
@@ -315,6 +328,17 @@
   // the children pass down through the `runGeneration` waterfall.
   function makeChildren(parent, numChildren, generation, cb) {
     // FILL THIS IN
+    var settings = {
+      "url": "https://yu0o6nuywg.execute-api.us-east-1.amazonaws.com/prod/mutateroute",
+      "method": "POST",
+      "timeout": 0,
+      "headers": {
+        "Content-Type": "text/plain"
+      },
+      "data": `{\"routeId\": \"${parent.routeId}\", \"lengthStoreThreshold\": ${lengthStoreThreshold}, \"numChildren\": ${numChildren}}\r\n`,
+    };
+    
+    $.ajax(settings).done((children) =>  cb(null, children))
   }
 
   // Get the full details of the specified route. You should largely
@@ -322,6 +346,16 @@
   // `callback` as the `success` callback function in the Ajax call.
   function getRouteById(routeId, callback) {
     // FILL THIS IN
+    var settings = {
+        "url": `https://yu0o6nuywg.execute-api.us-east-1.amazonaws.com/prod/routes/${routeId}`,
+        "method": "GET",
+        "timeout": 0,
+      };
+      
+      $.ajax(settings).done(function (response) {
+        const route = response.Item;
+        callback(route)
+      });
   }
 
   // Get city data (names, locations, etc.) from your new Lambda that returns
@@ -329,6 +363,16 @@
   // function in the Ajax call.
   function fetchCityData(callback) {
     // FILL THIS IN
+    var settings = {
+      "url": "https://yu0o6nuywg.execute-api.us-east-1.amazonaws.com/prod/city-data",
+      "method": "GET",
+      "timeout": 0,
+    };
+    
+    $.ajax(settings).done(function (response) {
+      const cities = response.Item.cities;
+      callback(cities)
+    });
   }
 
   ////////////////////////////////////////////////////////////
@@ -373,6 +417,14 @@
   // element in the HTML.
   function displayRoute(result) {
     // FILL THIS IN
+    $("#best-length").text(best.len);
+    $("#best-path").text(JSON.stringify(best.bestPath));
+    $("#best-routeId").text(best.routeId);
+    $("#best-route-cities").text("");
+    best.bestPath.forEach((index) => {
+      const cityName = cityData[index].properties.name;
+      $("#best-route-cities").append(`<li>${cityName}</li>`);
+    });
   }
 
   // Display the best routes (length and IDs) in some way.
@@ -387,6 +439,9 @@
   // the waterfall in `runGeneration`.
   function displayBestRoutes(bestRoutes, dbp_cb) {
     // FILL THIS IN
+    $("#best-route-list").append(`<li>We found this route: ${bestRoutes[0].route}.  This route has length
+     ${bestRoutes[0].len} and the routeId is: ${bestRoutes[0].routeId} </li>`);
+    dbp_cb(null, bestRoutes);
   }
 
   ////////////////////////////////////////////////////////////
@@ -553,4 +608,4 @@
     // front to be used in the mapping throughout.
     fetchCityData(initializeMap);
   });
-})(jQuery);
+}(jQuery));
