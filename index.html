@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
   <head>
     <meta charset="utf-8" />
-    <title>Evo-TSP</title>
+    <title>Evolving Solutions to The Traveling Salesman Problem</title>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="description" content="Evolving solutions to a TSP instance" />
-    <meta name="author" content="PUT YOUR NAME HERE" />
+    <meta name="author" content="Cassandra Schultz" />
 
     <link
       rel="stylesheet"
@@ -14,6 +15,7 @@
       integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
       crossorigin=""
     />
+    <link rel="stylesheet" href="styles.css">
     <!-- Make sure you put this AFTER Leaflet's CSS -->
     <script
       src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
@@ -23,7 +25,7 @@
   </head>
 
   <body>
-    <h1>Evo-TSP</h1>
+    <h1>Evolving Solutions to The Traveling Salesman Problem</h1>
     <div>
       <h2>"Global" parameters</h2>
 
@@ -76,8 +78,8 @@
       </div>
     </div>
 
-    <script src="jquery-3.6.0.min.js"></script>
-    <script src="async.min.js"></script>
+    <script src="vendor/jquery-3.6.0.min.js"></script>
+    <script src="vendor/async.min.js"></script>
     <script src="evotsp.js"></script>
     <script>
       var mymap = L.map("map").setView([46.7296, -94.6859], 6); //automate or import view for future
@@ -92,7 +94,7 @@
           tileSize: 512,
           zoomOffset: -1,
           accessToken:
-            "PUT YOUR TOKEN HERE",
+            "pk.eyJ1IjoiY2Fzc2llMzUiLCJhIjoiY2tuNmF6djV3MGNjaTJucHNranQ1dXN3cSJ9.lqvkfFwEBbu5LE87hsXF1w",
         }
       ).addTo(mymap);
     </script>

@@ -1,0 +1,10 @@
+*{
+    font-family: 'Courier New', Courier, monospace;
+}
+input{
+    margin-bottom: 5px;
+}
+.leaflet-container{
+    border:5px solid black;
+    border-radius:3px;
+}
