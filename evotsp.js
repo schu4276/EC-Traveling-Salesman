@@ -417,14 +417,14 @@
   // element in the HTML.
   function displayRoute(result) {
     // FILL THIS IN
-    $("#best-length").text(best.len);
-    $("#best-path").text(JSON.stringify(best.bestPath));
-    $("#best-routeId").text(best.routeId);
-    $("#best-route-cities").text("");
-    best.bestPath.forEach((index) => {
-      const cityName = cityData[index].properties.name;
-      $("#best-route-cities").append(`<li>${cityName}</li>`);
-    });
+    console.log(result)
+    if(result.length === undefined){
+      $("#new-route-list").append(`<li>We generated route ${result.routeId} with length ${result.len}</li>`);
+    }else{
+      $("#new-route-list").append(`<li>We generated route ${result.routeId} with length ${result.length}</li>`);
+    }
+      
+    
   }
 
   // Display the best routes (length and IDs) in some way.
